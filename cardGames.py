@@ -64,7 +64,7 @@ class games():
         options = ['HIT','STAY']
         for player in table:
             pt = self.calcTotal(player['Hand'])
-            print("It is {}'s turn to play.\n".format(player['Name']))
+            print("It's {}'s turn to play.\n".format(player['Name']))
             print(pd.DataFrame(player['Hand']))
             print('Total hand value = {}\n'.format(pt))
             while pt <= 21:
