@@ -2,13 +2,14 @@
  * @file cardGames.py
  * @authors Ben Bellerose
  * @date May 23 2019
- * @modified May 24 2019
+ * @modified May 27 2019
  * @modifiedby BB
  * @brief class full of playing card games
  */
  """
 import pandas as pd
 from playingCards import cards
+from booking import book
 
 class games():
     """Input: names - list of dictionaries with player name and hand
@@ -29,32 +30,6 @@ class games():
             hand.append(deck[0])
             del deck[0]
         return [deck,hand]
-
-    """Input: player - dictionary containing player name and score
-       Function: place a bet for individual player
-       Output: list of dictionaries containing player name and hand"""
-    def makeBet(self,player,**arg):
-        while True:
-            if 'bet' in arg:
-                bet = arg['bet']
-            else:
-                bet = input("\n{}'s turn how much do you want to bet? (Funds:{})\n".format(player['Name'],player['Score']))
-            try:
-                bet = float(bet)
-                if float(bet) <= float(player['Score']):
-                    bet = float(bet)
-                    player['Score'] = player['Score'] - bet
-                    break
-                else:
-                    if 'bet' in arg:
-                        bet = float(player['Score'])
-                        player['Score'] = player['Score'] - bet
-                        break
-                    else:
-                        print('Desired bet to big select smaller amount')
-            except:
-                print('Invalid entry bet must be a number')
-        return [player,bet]
 
     """Input: players - list containing dictionary with players name and score
               deck - list of dictionaries containing the playing cards values
@@ -82,7 +57,7 @@ class games():
             if table[i]['Name'] not in pBets:
                 pi = [players.index(a) for a in players if a['Name'] == table[i]['Name']][0] #Player score index
                 p = players[pi] #Return player from player bank
-                players[pi],bet = self.makeBet(p) #Make bet for player
+                players[pi],bet = book.makeBet(p) #Make bet for player
                 bets.append({'Name':table[i]['Name'],'Amount':bet})
             print('\nDealers Hand')
             print('{}\n'.format(pd.DataFrame(dealer).head(1))) #Show one of dealers cards
@@ -96,6 +71,10 @@ class games():
                     userinput = input('\nWhat would you like to do? (Hit/Stay/Double/Surrender)\n')
                 if userinput.upper() == 'HIT':
                     deck,table[i]['Hand'] = self.dealHand(deck,table[i]['Hand'])
+                    if cards.calcTotal(table[i]['Hand']) >= 11:
+                        aIndex = [table[i]['Hand'].index(a) for a in table[i]['Hand'] if a['Value'] == 'Ace'] #Ace index
+                        if len(aIndex) > 0:
+                            table[i]['Hand'][aIndex[0]]['Value'] = 1 #Convert ace to 1
                     pt = cards.calcTotal(table[i]['Hand'])
                     print('\n{}'.format(pd.DataFrame(table[i]['Hand'])))
                 elif userinput.upper() == 'STAY':
@@ -106,9 +85,14 @@ class games():
                     p = players[pi] #Return player from player bank
                     bi = [bets.index(a) for a in bets if a['Name'] == player['Name']][0] #Player bet index
                     b = bets[bi] #Return player from bet bank
-                    players[pi],bet = self.makeBet(p,bet=b['Amount']) #Make bet for player
+                    players[pi],bet = book.makeBet(p,bet=b['Amount']) #Make bet for player
                     bets[bi]['Amount'] = bets[bi]['Amount'] + bet
                     deck,table[i]['Hand'] = self.dealHand(deck,table[i]['Hand'])
+                    if cards.calcTotal(table[i]['Hand']) >= 11:
+                        aIndex = [table[i]['Hand'].index(a) for a in table[i]['Hand'] if a['Value'] == 'Ace'] #Ace index
+                        if len(aIndex) > 0:
+                            table[i]['Hand'][aIndex[0]]['Value'] = 1 #Convert ace to 1
+                    pt = cards.calcTotal(table[i]['Hand'])
                     print('{}\n'.format(pd.DataFrame(table[i]['Hand'])))
                     break
                 elif userinput.upper() == 'SURRENDER':
@@ -134,8 +118,12 @@ class games():
             print('Dealers Hand')
             print('{}\n'.format(pd.DataFrame(dealer)))
             dt = cards.calcTotal(dealer)
-            while dt < 17:
+            while dt < 17 and dt < pt:
                 deck,dealer = self.dealHand(deck,dealer)
+                if cards.calcTotal(dealer) >= 11:
+                    aIndex = [dealer.index(a) for a in dealer if a['Value'] == 'Ace'] #Ace index
+                    if len(aIndex) > 0:
+                        dealer[aIndex[0]]['Value'] = 1 #Convert ace to 1
                 print('Dealers Hand')
                 print('{}\n'.format(pd.DataFrame(dealer)))
                 dt = cards.calcTotal(dealer)

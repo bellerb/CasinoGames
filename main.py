@@ -1,7 +1,41 @@
 from playingCards import cards
 from cardGames import games
+from booking import book
 
 print('****Welcome to Console Casino****\n')
+
+while True:
+    numPlayers = input('How many players are playing?\n')
+    if numPlayers.isnumeric():
+        numPlayers = int(numPlayers)
+        print()
+        break
+    else:
+        print('Sorry your answer must be an integer\n')
+
+players = []
+accounts = book.loadAccounts()
+accountN = accounts['Name'].tolist() #Name of accounts
+for x in range(numPlayers):
+    while True:
+        print('Player accounts:\n')
+        for name in accountN:
+            print('-{}'.format(name))
+        print('-New\n')
+        pName = input('Which account are you?\n')
+        if pName in accountN:
+            players.append(accounts[accounts['Name']==pName].to_dict('records')[0])
+            del accountN[accountN.index(pName)]
+            break
+        elif pName.upper() == 'NEW':
+            pName = input('\nWhat do you want your name to be?\n')
+            accounts = book.newAccount(pName,50,accounts)
+            book.saveScores(accounts)
+            players.append(accounts[accounts['Name']==pName].to_dict('records')[0])
+            break
+        else:
+            print('Sorry that account does not exist\n')
+print()
 
 options = ['BLACKJACK']
 while True:
@@ -17,12 +51,13 @@ while True:
     else:
         break
 
-players = [{'Name':'Ben','Score':50.00}]
 if userInput.upper() == 'BLACKJACK':
     print('\n****Welcome to Black Jack****')
     while True:
         deck = cards.deck()
         players = games().blackJack(players,deck)
+        accounts = book.updateScores(players,accounts)
+        book.saveScores(accounts)
         i = 0
         while i < len(players):
             if players[i]['Score'] == 0:
