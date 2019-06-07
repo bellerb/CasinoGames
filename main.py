@@ -15,7 +15,10 @@ while True:
 
 players = []
 accounts = book.loadAccounts()
-accountN = accounts['Name'].tolist() #Name of accounts
+if len(accounts) > 0:
+    accountN = accounts['Name'].tolist() #Name of accounts
+else:
+    accountN = []
 for x in range(numPlayers):
     while True:
         print('Player accounts:\n')
@@ -63,6 +66,8 @@ if userInput.upper() == 'BLACKJACK':
             if players[i]['Score'] == 0:
                 print("\n{}'s out of points".format(players[i]['Name']))
                 del players[i]
+                accounts = book.updateScores(players,accounts)
+                book.saveScores(accounts)
             else:
                 qCheck = False
                 while True:

@@ -2,7 +2,7 @@
  * @file cardGames.py
  * @authors Ben Bellerose
  * @date May 23 2019
- * @modified May 27 2019
+ * @modified May 28 2019
  * @modifiedby BB
  * @brief class full of playing card games
  */
@@ -78,7 +78,6 @@ class games():
                     pt = cards.calcTotal(table[i]['Hand'])
                     print('\n{}'.format(pd.DataFrame(table[i]['Hand'])))
                 elif userinput.upper() == 'STAY':
-                    print()
                     break
                 elif userinput.upper() == 'DOUBLE': #Double inital bet and take card as last card
                     pi = [players.index(a) for a in players if a['Name'] == table[i]['Name']][0] #Player score index
@@ -93,7 +92,7 @@ class games():
                         if len(aIndex) > 0:
                             table[i]['Hand'][aIndex[0]]['Value'] = 1 #Convert ace to 1
                     pt = cards.calcTotal(table[i]['Hand'])
-                    print('{}\n'.format(pd.DataFrame(table[i]['Hand'])))
+                    print('\n{}'.format(pd.DataFrame(table[i]['Hand'])))
                     break
                 elif userinput.upper() == 'SURRENDER':
                     table[i]['Hand'] = [{'Suit':'Special','Value':999}]
@@ -113,9 +112,9 @@ class games():
             i = i + 1
 
         #Deal for dealer
-        check = [True for a in table if cards.calcTotal(a['Hand']) > 21] #Check to make sure all players didn't bust
+        check = [True for a in table if cards.calcTotal(a['Hand']) >= 21] #Check to make sure all players didn't bust
         if len(check) != len(table):
-            print('Dealers Hand')
+            print('\nDealers Hand')
             print('{}\n'.format(pd.DataFrame(dealer)))
             dt = cards.calcTotal(dealer)
             while dt < 17 and dt < pt:

@@ -2,7 +2,7 @@
  * @file cardGames.py
  * @authors Ben Bellerose
  * @date May 27 2019
- * @modified May 27 2019
+ * @modified May 28 2019
  * @modifiedby BB
  * @brief class full of gambling book keeping functions
  */
@@ -14,7 +14,10 @@ class book():
        Function: loads player accounts
        Output: dataframe with all player accounts"""
     def loadAccounts():
-        accounts = pd.read_csv('data/accounts.csv')
+        try:
+            accounts = pd.read_csv('data/accounts.csv')
+        except:
+            accounts = []
         return accounts
 
     """Input: name - string containing the players name
@@ -24,7 +27,7 @@ class book():
        Output: dataframe with all player accounts"""
     def newAccount(name,score,accounts):
         player = {'Name':name,'Score':score}
-        accounts = accounts.append(player,ignore_index=True)
+        accounts = pd.DataFrame(accounts).append(player,ignore_index=True)
         return accounts
 
     """Input: accounts - dataframe containing all current player accounts
@@ -43,13 +46,7 @@ class book():
        Function: updates player account dicionary to current stats
        Output:dataframe with all player accounts updated"""
     def updateScores(players,accounts):
-        for player in players:
-            for account in accounts.iterrows():
-                print(account)
-                print(player['Name'])
-                if account['Name'] == player['Name']:
-                    account['Score'] == player['Score']
-                    break
+        accounts = players
         return accounts
 
     """Input: player - dictionary containing player name and score
@@ -62,10 +59,12 @@ class book():
             else:
                 bet = input("\n{}'s turn how much do you want to bet? (Funds:{})\n".format(player['Name'],player['Score']))
             try:
-                if float(bet) <= float(player['Score']):
+                if float(bet) <= float(player['Score']) and float(bet) > 0:
                     bet = float(bet)
                     player['Score'] = player['Score'] - bet
                     break
+                elif float(bet) <= 0:
+                    print('Sorry a bet of 0 is not allowed')
                 else:
                     if 'bet' in arg:
                         bet = float(player['Score'])
