@@ -2,7 +2,7 @@
  * @file cardGames.py
  * @authors Ben Bellerose
  * @date May 23 2019
- * @modified May 28 2019
+ * @modified August 26 2019
  * @modifiedby BB
  * @brief class full of playing card games
  */
@@ -30,6 +30,13 @@ class games():
             hand.append(deck[0])
             del deck[0]
         return [deck,hand]
+
+    """Input: players - list containing dictionary with players name and score
+              deck - list of dictionaries containing the playing cards values
+       Function: full round of texas hold em for multiple players
+       Output: list of dictionaries containing player name and hand"""
+    def texasHoldEm(self,players,deck):
+        return players
 
     """Input: players - list containing dictionary with players name and score
               deck - list of dictionaries containing the playing cards values
